@@ -18,8 +18,16 @@ fn main() -> Result<()> {
     }
 }
 
+fn get_brew_path() -> &'static str {
+    if std::path::Path::new("/opt/homebrew/bin/brew").exists() {
+        "/opt/homebrew/bin/brew"
+    } else {
+        "/usr/local/bin/brew"
+    }
+}
+
 fn start_redis() -> Result<()> {
-    Command::new("brew")
+    Command::new(get_brew_path())
         .args(["services", "start", "redis"])
         .status()
         .context("Failed to start Redis")?;
@@ -28,7 +36,7 @@ fn start_redis() -> Result<()> {
 }
 
 fn stop_redis() -> Result<()> {
-    Command::new("brew")
+    Command::new(get_brew_path())
         .args(["services", "stop", "redis"])
         .status()
         .context("Failed to stop Redis")?;
