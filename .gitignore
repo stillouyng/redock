@@ -22,5 +22,4 @@ target/
 
 **/*.app
 **/*.dmg
-**/*.icns
 *.tar.gz
