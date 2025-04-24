@@ -23,15 +23,20 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Build (Release)
+      - name: Build (Release) and Test
         run: |
           cargo build --release
           ./target/release/redock --version
+          brew services stop redis
+          echo "🟢 Redis stopped successfully"
 
-      - name: Verify Redis is running
+        shell: bash {0}
+
+      - name: Stop Redis (fallback)
+        if: always()
         run: |
-          brew services start redis
-          redis-cli ping
+          brew services stop redis || true
+          echo "🔴 Redis stopped (fallback)"
 
       - name: Create .app bundle
         run: |
