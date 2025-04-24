@@ -11,6 +11,7 @@ Before using **redock**, install Redis:
   brew install redis
 ```
 
+
 ## 📦 Installation
 1. Download the latest version from [Releases](https://github.com/stillouyng/redock/releases).
 2. Unzip and drag `Redock.app` to your `Applications` folder.  
