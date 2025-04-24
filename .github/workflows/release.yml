@@ -13,7 +13,6 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
           profile: minimal
           override: true
 
@@ -24,18 +23,17 @@ jobs:
         run: |
           mkdir -p Redock.app/Contents/{MacOS,Resources}
           cp target/release/redock Redock.app/Contents/MacOS/
-          cp assets/icon.icns Redock.app/Contents/Resources/
+          cp assets/redock.icns Redock.app/Contents/Resources/
           
-          # Генерируем Info.plist
           cat > Redock.app/Contents/Info.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
             <key>CFBundleName</key>
-            <string>Redock</string>
+            <string>redock</string>
             <key>CFBundleIconFile</key>
-            <string>icon.icns</string>
+            <string>redock.icns</string>
             <key>CFBundleExecutable</key>
             <string>redock</string>
           </dict>
@@ -45,7 +43,7 @@ jobs:
       - name: Create archive
         run: tar -czvf Redock-${{ github.ref_name }}.tar.gz Redock.app
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Redock-${{ github.ref_name }}
           path: Redock-${{ github.ref_name }}.tar.gz
