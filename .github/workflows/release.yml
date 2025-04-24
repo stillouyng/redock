@@ -10,6 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Redis
+        run: |
+          brew update
+          brew install redis
+
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -21,6 +27,11 @@ jobs:
         run: |
           cargo build --release
           ./target/release/redock --version
+
+      - name: Verify Redis is running
+        run: |
+          brew services start redis
+          redis-cli ping
 
       - name: Create .app bundle
         run: |
