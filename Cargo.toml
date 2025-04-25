@@ -1,8 +1,13 @@
 [package]
 name = "redock"
 version = "0.1.0"
+authors = ["kkodokkushi@gmail.com"]
 edition = "2024"
 
+description = "Redis manager with GUI"
+license = "MIT"
+repository = "https://github.com/stillouyng/redock"
+readme = "README.md"
+
 [dependencies]
-anyhow = "1.0.98"
-ctrlc = "3.4.6"
+iced = { version = "0.13.1", features = ["tokio", "debug"] }
