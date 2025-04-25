@@ -1,4 +1,6 @@
 # redock 🌱
+[![Release Build](https://github.com/stillouyng/redock/actions/workflows/release.yml/badge.svg)](https://github.com/stillouyng/redock/actions/workflows/release.yml)
+
 **Redis Manager for macOS with Dock Integration**
 
 A simple Rust application that **starts and stops the Redis server** when the app is opened or closed.
