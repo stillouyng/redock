@@ -24,4 +24,3 @@ target/
 **/*.dmg
 *.tar.gz
 .idea/
-Cargo.lock
