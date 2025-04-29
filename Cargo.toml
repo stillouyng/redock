@@ -11,3 +11,4 @@ readme = "README.md"
 
 [dependencies]
 iced = { version = "0.13.1", features = ["tokio", "debug"] }
+tokio = { version = "1.44.2", features = ["full"] }
