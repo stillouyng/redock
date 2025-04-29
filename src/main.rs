@@ -1,9 +1,16 @@
 mod utils;
 
+use std::sync::atomic::{AtomicBool, Ordering};
+
 use iced::widget::{button, column, row, text};
 use iced::{Subscription, Task, window};
 
-use utils::{execute_command, format_output, get_brew_path};
+use utils::{
+    execute_command, format_output,
+    get_brew_path, get_redis_cli_path
+};
+
+static REDIS_RUNNING: AtomicBool = AtomicBool::new(false);
 
 #[derive(Debug, Clone)]
 enum Message {
@@ -32,6 +39,7 @@ impl Redock {
         let result = execute_command(get_brew_path(), &["services", "start", "redis"]);
         let formatted = format_output(result);
         self.logs.push(formatted);
+        REDIS_RUNNING.store(true, Ordering::Release);
     }
 
     fn subscription(&self) -> Subscription<Message> {
@@ -51,16 +59,17 @@ impl Redock {
                 let msg = format_output(result);
                 self.logs.push(msg);
                 self.redis_status = "● running".to_string();
+                REDIS_RUNNING.store(true, Ordering::Release);
             }
             Message::StopPressed => {
                 let result = execute_command(get_brew_path(), &["services", "stop", "redis"]);
                 let msg = format_output(result);
                 self.logs.push(msg);
-
+                REDIS_RUNNING.store(false, Ordering::Release);
                 self.redis_status = "○ stopped".to_string();
             }
             Message::PingPressed => {
-                let output = execute_command("redis-cli", &["PING"]);
+                let output = execute_command(get_redis_cli_path(), &["PING"]);
                 let formatted = format_output(output);
                 self.logs.push(format!("PING: {:?}", formatted));
                 if self.logs.len() > 5 {
@@ -68,11 +77,18 @@ impl Redock {
                 }
             }
             Message::WindowClosed => {
-                self.logs.push("Stopping redis server".to_string());
-                let result = execute_command(get_brew_path(), &["services", "stop", "redis"]);
-                let msg = format_output(result);
+                self.logs.push("Stopping redis server...".to_string());
+                let mut msg = "".to_string();
+                if REDIS_RUNNING.load(Ordering::Acquire) {
+                    let result = execute_command(
+                        get_brew_path(),
+                        &["services", "stop", "redis"]
+                    );
+                    msg = format_output(result);
+                } else {
+                    msg = "Redis already closed".to_string();
+                }
                 self.logs.push(msg);
-
                 std::process::exit(0);
             }
         }

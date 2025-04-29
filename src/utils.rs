@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::process::{Command, Output};
 
 pub fn get_brew_path() -> &'static str {
@@ -6,6 +7,22 @@ pub fn get_brew_path() -> &'static str {
     } else {
         "/usr/local/bin/brew"
     }
+}
+
+pub fn get_redis_cli_path() -> &'static str {
+    
+    let paths = [
+        "/opt/homebrew/bin/redis-cli",    // Apple Silicon
+        "/usr/local/bin/redis-cli",       // Intel
+        "/usr/bin/redis-cli"              // System
+    ];
+
+    for path in &paths {
+        if std::path::Path::new(path).exists() {
+            return path;
+        }
+    }
+    "redis-cli"
 }
 
 pub fn execute_command(command_name: &str, args: &[&str]) -> Result<Output, String> {
