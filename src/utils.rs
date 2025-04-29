@@ -1,5 +1,6 @@
-use std::path::PathBuf;
-use std::process::{Command, Output};
+use std::process::Output;
+use tokio::process::Command;
+
 
 pub fn get_brew_path() -> &'static str {
     if std::path::Path::new("/opt/homebrew/bin/brew").exists() {
@@ -25,13 +26,12 @@ pub fn get_redis_cli_path() -> &'static str {
     "redis-cli"
 }
 
-pub fn execute_command(command_name: &str, args: &[&str]) -> Result<Output, String> {
-    let output = Command::new(command_name)
+pub async fn execute_command(command_name: &str, args: &[&str]) -> Result<Output, String> {
+    Command::new(command_name)
         .args(args)
         .output()
-        .map_err(|e| format!("Unexpected error: {}", e))?;
-
-    Ok(output)
+        .await
+        .map_err(|e| format!("Command failed: {}", e))
 }
 
 pub fn format_output(result: Result<Output, String>) -> String {
