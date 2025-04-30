@@ -41,3 +41,7 @@ After unzipping, use xattr to skip the malware check for this app.
 - Fully asynchronous operations
 - Comprehensive error handling
 - Brew/redis-cli existence verification
+
+### v1.0.0 — Stable Release
+- **Production-ready** Redis manager
+- Clean architecture with `commands`/`utils` separation
