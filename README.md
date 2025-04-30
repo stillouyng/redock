@@ -20,3 +20,24 @@ After unzip use xattr to skip the malware check for this app.
 ## 📦 Installation
 1. Download the latest version from [Releases](https://github.com/stillouyng/redock/releases).
 2. Unzip and drag `Redock.app` to your `Applications` folder.  
+
+
+## Evolution Highlights
+
+### v0.1.1 - Core Foundation
+- Implemented base functionality without GUI
+- Basic Redis control functions
+
+### v0.1.2 - GUI Prototype
+- Added initial GUI interface
+- Basic start/stop/ping controls *(Note: redis-cli detection not implemented yet)*
+
+### v0.1.3 - Stability Improvements
+- Added automatic redis-cli path detection
+- Implemented Redis status tracking via AtomicBool
+- Fixed critical launch issues
+
+### v0.1.4 - Asynchronous Core Update
+- Fully asynchronous operations
+- Comprehensive error handling
+- Brew/redis-cli existence verification
