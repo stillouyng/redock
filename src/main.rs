@@ -1,6 +1,5 @@
 mod utils;
 
-use std::io::Take;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use iced::widget::{button, column, row, text};
@@ -35,15 +34,18 @@ impl Redock {
             redis_status: "○ starting...".to_string(),
             logs: vec![],
         };
-        let task = Task::perform(
-            async {
-                let result = execute_command(get_brew_path(), &["services", "start", "redis"]).await;
-                format_output(result)
-            },
-            |output| {
-                Message::StartCompleted(output)
-            }
-        );
+        let task = match get_brew_path() {
+            Ok(path) => Task::perform(
+                async {
+                    execute_command(path, &["services", "start", "redis"]).await
+                },
+                |result| Message::StartCompleted(format_output(result))
+            ),
+            Err(e) => Task::perform(
+                async { format_output(Err(e)) },
+                Message::StartCompleted
+            )
+        };
 
         (redock, task)
     }
@@ -57,37 +59,52 @@ impl Redock {
             }
         })
     }
-    
+
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::StartPressed => {
                 self.redis_status = "○ starting...".to_string();
-                Task::perform(
-                    async {
-                        let result = execute_command(get_brew_path(), &["services", "start", "redis"]).await;
-                        format_output(result)
-                    },
-                    Message::StartCompleted
-                )
+                match get_brew_path() {
+                    Ok(path) => Task::perform(
+                        async {
+                            execute_command(path, &["services", "start", "redis"]).await
+                        },
+                        |result| Message::StartCompleted(format_output(result))
+                    ),
+                    Err(e) => Task::perform(
+                        async { format_output(Err(e)) },
+                        Message::StartCompleted
+                    )
+                }
             },
             Message::StopPressed => {
                 self.redis_status = "○ stopping...".to_string();
-                Task::perform(
-                    async {
-                        let result = execute_command(get_brew_path(), &["services", "stop", "redis"]).await;
-                        format_output(result)
-                    },
-                    Message::StopCompleted
-                )
+                match get_brew_path() {
+                    Ok(path) => Task::perform(
+                        async {
+                            execute_command(path, &["services", "stop", "redis"]).await
+                        },
+                        |result| Message::StopCompleted(format_output(result))
+                    ),
+                    Err(e) => Task::perform(
+                        async { format_output(Err(e)) },
+                        Message::StopCompleted
+                    )
+                }
             },
             Message::PingPressed => {
-                Task::perform(
-                    async {
-                        let result = execute_command(get_redis_cli_path(), &["PING"]).await;
-                        format_output(result)
-                    },
-                    Message::PingCompleted
-                )
+                match get_redis_cli_path() {
+                    Ok(path) => Task::perform(
+                        async {
+                            execute_command(path, &["PING"]).await
+                        },
+                        |result| Message::PingCompleted(format_output(result))
+                    ),
+                    Err(e) => Task::perform(
+                        async { format_output(Err(e)) },
+                        Message::PingCompleted
+                    )
+                }
             },
             Message::StartCompleted(output) => {
                 self.redis_status = "● running".to_string();
@@ -110,15 +127,18 @@ impl Redock {
             },
             Message::WindowClosed => {
                 if REDIS_RUNNING.load(Ordering::Acquire) {
-                    Task::perform(
-                        async {
-                            let _ = execute_command(get_brew_path(), &["services", "stop", "redis"]).await;
-                            "Redis stopped".to_string()
-                        },
-                        |_| {
-                            std::process::exit(0);
-                        }
-                    )
+                    match get_brew_path() {
+                        Ok(path) => Task::perform(
+                            async {
+                                execute_command(path, &["services", "stop", "redis"]).await
+                            },
+                            |_| std::process::exit(0)
+                        ),
+                        Err(e) => Task::perform(
+                            async { format_output(Err(e)) },
+                            |_| std::process::exit(0)
+                        )
+                    }
                 } else {
                     std::process::exit(0);
                 }
