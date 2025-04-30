@@ -1,9 +1,6 @@
 use std::process::Output;
 use tokio::process::Command;
 
-// TODO: Return Result<&'static str, error>
-// TODO: Add enum Error
-
 #[derive(Debug)]
 pub enum Error {
     BrewNotFound,
@@ -15,7 +12,7 @@ pub fn get_brew_path() -> Result<&'static str, Error> {
     let paths = [
         "/opt/homebrew/bin/brew",              // Apple Silicon
         "/usr/local/bin/brew",                 // Intel
-        "/home/linuxbrew/.linuxbrew/bin/brew"  // Linux
+        "/home/linuxbrew/.linuxbrew/bin/brew", // Linux
     ];
 
     for path in &paths {
@@ -28,9 +25,9 @@ pub fn get_brew_path() -> Result<&'static str, Error> {
 
 pub fn get_redis_cli_path() -> Result<&'static str, Error> {
     let paths = [
-        "/opt/homebrew/bin/redis-cli",    // Apple Silicon
-        "/usr/local/bin/redis-cli",       // Intel
-        "/usr/bin/redis-cli"              // System
+        "/opt/homebrew/bin/redis-cli", // Apple Silicon
+        "/usr/local/bin/redis-cli",    // Intel
+        "/usr/bin/redis-cli",          // System
     ];
 
     for path in &paths {
@@ -66,7 +63,9 @@ pub fn format_output(result: Result<Output, Error>) -> String {
             }
         }
         Err(Error::BrewNotFound) => "🚨 Error: brew not found in standard locations".to_string(),
-        Err(Error::RedisCliNotFound) => "🚨 Error: redis-cli not found in standard locations".to_string(),
+        Err(Error::RedisCliNotFound) => {
+            "🚨 Error: redis-cli not found in standard locations".to_string()
+        }
         Err(Error::CommandFailed(e)) => format!("🚨 Command failed: {}", e),
     }
 }
